@@ -1,17 +1,22 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React, {useState} from 'react';
+import * as React from 'react';
+import {StatusBar, StatusBarStyle, StyleSheet, View} from 'react-native';
 import {
-    Button,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    View,
-} from 'react-native';
+    Button, MD3LightTheme as DefaultTheme, PaperProvider, TextInput,} from 'react-native-paper';
+  
 import {NavigationContainer} from '@react-navigation/native';
 //import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 //const Stack = createNativeStackNavigator();
+const theme = {
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        primary: '#e09812',
+        secondary: '#1f5ad5',
+    },
+};
+
 const Nav = createBottomTabNavigator();
 
 const tabIcons = {
@@ -27,23 +32,32 @@ const getScreenOptions = ({route}) => ({
             color={color}
             />
     ),
-    tabBarActiveTintColor: 'tomato',
-    tavBarInactiveTintColor: 'gray',
-})
+    tabBarActiveTintColor: '#d5661f',
+    tavBarInactiveTintColor: '#7f7974',
+    headerShown: true,
+});
 
 export default function App() {
+    return (
+        <PaperProvider theme={theme}>
+            <InnerApp />
+        </PaperProvider>
+    )
+}
+
+function InnerApp() {
     return (
         <NavigationContainer>
             <Nav.Navigator screenOptions={getScreenOptions}>
                 <Nav.Screen
-                    name="home"
-                    component={ButtonOnlyView}
-                    options={{title: 'Aloitusruutu'}}
-                />
-                <Nav.Screen
                     name="other"
                     component={StatusBarTogglerView}
                     options={{title: 'Toinen juttu'}}
+                />
+                <Nav.Screen
+                    name="home"
+                    component={ButtonOnlyView}
+                    options={{title: 'Aloitusruutu'}}
                 />
             </Nav.Navigator>
         </NavigationContainer>
@@ -53,37 +67,23 @@ export default function App() {
 function ButtonOnlyView({navigation}) {
     return (
         <View>
-            <Button
-                title="Avaa juttu"
-                onPress={() => navigation.navigate('other')}
-            />
+            <Button onPress={() => navigation.navigate('other')}>
+                Avaa juttu
+            </Button>
         </View>
     );
 }
 
 function StatusBarTogglerView() {
-    const [hidden, setHidden] = useState(false);
-    const changeStatusBarVisibility = () => setHidden(!hidden);
-
+  
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar
-                animated={true}
-                backgroundColor="#61dafb"
-                barStyle={'default'}
-                hidden={hidden}
-            />
-            <Text style={styles.textStyle}>
-                StatusBar Visibility:{'\n'}
-                {hidden ? 'Hidden' : 'Visible'}
-            </Text>
+        <View style={styles.container}>
+            <StatusBar {...styles.statusBar} />
             <View style={styles.buttonsContainer}>
-                <Button
-                    title="Toggle StatusBar"
-                    onPress={changeStatusBarVisibility}
-                />
+                <TextInput label='Ajon kuvaus' />
+                <Button mode='contained'>Aloita ajo</Button>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
@@ -91,7 +91,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: '#ECF0F1',
+        backgroundColor: '#09d182',
+    },
+    statusBar: {
+        animated: true,
+        backgroundColor: '#d5661f',
+        barStyle: 'default' as StatusBarStyle,
+    },
+    textInput: {
+        paddingTop: 10,
+        paddingBottom: 10,
     },
     buttonsContainer: {
         padding: 10,
