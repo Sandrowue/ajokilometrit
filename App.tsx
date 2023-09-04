@@ -7,6 +7,7 @@ import * as React from 'react';
 import {View} from 'react-native';
 import {Button, MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
 import TripForm from './TripForm';
+import TripList from './TripList'
 
 const theme = {
     ...DefaultTheme,
@@ -48,10 +49,10 @@ export default function App() {
 function InnerApp() {
     return (
         <NavigationContainer>
-            <Nav.Navigator screenOptions={getScreenOptions} initialRouteName='other'>
+            <Nav.Navigator screenOptions={getScreenOptions}>
                 <Nav.Screen
                     name="home"
-                    component={ButtonOnlyView}
+                    component={TripList}
                     options={{title: 'Aloitusruutu'}}
                 />
                 <Nav.Screen
