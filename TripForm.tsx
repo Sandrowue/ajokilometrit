@@ -7,11 +7,16 @@ import { DateTimeField } from './DateTimeField';
 import {Trip} from './Trip'
 
 type Props = {
-    initialValue?: Trip;
-    onSubmit: (trip: Trip) => void;
+    initialValue?: Trip | null;
+    onSubmit?: (trip: Trip) => void;
+    onDelete?: () => void;
 };
 
-export default function TripForm ({onSubmit, initialValue: iv}: Props) {
+export default function TripForm ({
+    onSubmit,
+    initialValue: iv,
+    onDelete,
+}: Props) {
     const defaultCar = 'car1';
     const[vehicle, setVehicle] = useState(iv?.vehicleId ?? defaultCar);
     const[description, setDescription] = useState(iv?.description ?? '');
@@ -51,7 +56,18 @@ export default function TripForm ({onSubmit, initialValue: iv}: Props) {
             <TextInput label="Mittarilukema alussa" keyboardType='numeric' value={odometerAtBegin} onChangeText={(x) => setOdometerAtBegin(cleanNumberText(x))} />
             <TextInput label="Mittarilukema lopussa" keyboardType='numeric' value={odometerAtEnd} onChangeText={(x) => setOdometerAtEnd(cleanNumberText(x))} />
             <TextInput label="Reitin kuvaus" value={routeDescription} onChangeText={setRouteDescription}/>
-            <Button onPress={submitForm} mode="contained">Tallenna</Button>
+            
+            {onSubmit ?(
+                <Button onPress={submitForm} mode="contained">
+                    Tallenna
+                </Button>
+            ) :null}
+            {onDelete ? (
+                <Button onPress={() => onDelete()} mode="outlined">
+                    Poista
+                </Button>
+            ) : null}
+           
         </ScrollView>
     );
     }
