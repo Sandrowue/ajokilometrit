@@ -2,7 +2,8 @@ import {useState} from 'react';
 import {ScrollView} from 'react-native';
 import {Button, SegmentedButtons, TextInput} from 'react-native-paper';
 import {cleanNumberText, parseNumber} from './numbers';
-import {Trip} from './Trip'
+import {Trip} from './Trip';
+import {newId} from './newId';
 
 type Props = {
     onSubmit?: (trip: Trip) => void;
@@ -17,6 +18,7 @@ export default function NewTripForm({onSubmit}: Props) {
 
     function submitForm() {
         const trip: Trip = {
+            id: newId(),
             vehicleId: vehicle, 
             description,
             timestampAtBegin: new Date(),

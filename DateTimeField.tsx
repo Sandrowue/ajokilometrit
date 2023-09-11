@@ -3,7 +3,7 @@ import * as React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 
-import {getRoundedTime} from './timeUtils';
+import {getRoundedTime} from './time';
 
 type Props = {
     label: string;

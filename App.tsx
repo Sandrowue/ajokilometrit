@@ -1,12 +1,14 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 //const Stack = createNativeStackNavigator();
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 //import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as React from 'react';
-import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
-import NewTripForm from './NewTripForm';
-import TripList from './TripList'
+import { MD3LightTheme as DefaultTheme, PaperProvider } from 'react-native-paper';
+import NewTripCreator from './NewTripCreator';
+import { Trip } from './Trip';
+import TripList from './TripList';
+import { deleteTrip, loadTrips, saveTrip } from './store';
 
 const theme = {
     ...DefaultTheme,
@@ -46,17 +48,38 @@ export default function App() {
 }
 
 function InnerApp() {
+    const [trips, setTrips] = React.useState<Trip[]>(loadTrips());
+
+    function TripListScreen() {
+        return (
+            <TripList
+                trips={trips}
+                saveTrip={saveTrip}
+                deleteTrip={deleteTrip}
+            />
+        );
+    }
+    function NewTripScreen({navigation}) {
+        return (
+            <NewTripCreator
+                onStarted={() => {
+                    setTrips(loadTrips());
+                    navigation.navigate('home');
+                }}
+            />
+        );
+    }
     return (
         <NavigationContainer>
             <Nav.Navigator screenOptions={getScreenOptions}>
                 <Nav.Screen
                     name="home"
-                    component={TripList}
+                    component={TripListScreen}
                     options={{title: 'Aloitusruutu'}}
                 />
                 <Nav.Screen
                     name="newTrip"
-                    component={NewTripForm}
+                    component={NewTripScreen}
                     options={{title: 'Uusi matka'}}
                 />
             </Nav.Navigator>
