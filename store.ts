@@ -6,6 +6,7 @@ export function loadTrips(): Trip[] {
     trips.sort((a: Trip, b: Trip) => {
         return a.id > b.id ? -1 : a.id == b.id ? 0 : 1;
     });
+    trips = [...trips];
     return trips;
 }
 
@@ -17,6 +18,20 @@ export function saveTrip(trip: Trip): void {
     else {
         trips[index] = trip; // päivitetään ko. indexissä olevaa trippiä
     }
+
+    trips.sort((tripA: Trip, tripB:Trip) => {
+        const a = tripA.timestampAtBegin ?? null;
+        const b = tripB.timestampAtBegin ?? null;
+        if (a == b) {
+            //Vertaile id:n perusteella, jos timestampit ovat samat
+            //tai puuttuvat molemmista
+            const aId = tripA.id;
+            const bId = tripB.id;
+            return aId > bId ? -1 : aId == bId ? 0 : 1;
+        }
+        return a > b ? -1 : 1;
+    }
+    );
 }
 
 export function deleteTrip({id}: {id: string}): void {
