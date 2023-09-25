@@ -1,19 +1,30 @@
 import {Trip} from './Trip';
+import {loadJsonFile, overwriteJsonFile} from './jsonFiles';
 import {newId} from './newId';
 
+const TRIPS_FILE = 'ajokilsat.json';
 
-export function loadTrips(): Trip[] {
-    trips.sort((a: Trip, b: Trip) => {
-        return a.id > b.id ? -1 : a.id == b.id ? 0 : 1;
-    });
-    trips = [...trips];
-    return trips;
+let savedTrips: Trip[] | null = null;
+
+export async function getTrip(tripId: string) {
+    const trips = await loadTrips();
+    const trip: Trip | undefined = trips.find((x) => x.id === tripId);
+    if (trip === undefined) throw Error('Ei löydy matkaa id:llä ${tripId}');
+    return trip;
 }
 
-export function saveTrip(trip: Trip): void {
+export async function loadTrips(reload: boolean = false): Promise<Trip[]> {
+    if (savedTrips === null || reload) {
+        savedTrips = await loadJsonFile(TRIPS_FILE);
+    }
+    return savedTrips ?? exampleTrips;
+}
+
+export async function saveTrip(trip: Trip): Promise<void> {
+    const trips = await loadTrips();
     const index = trips.findIndex((x) => x.id === trip.id);
     if (index < 0) { // Ei löytynyt id:llä => uusi matka
-        trips.push(trip); // Lisätään annettu trip listan trips loppuun
+        trips.unshift(trip); // Lisätään annettu trip listan trips alkuun
     }
     else {
         trips[index] = trip; // päivitetään ko. indexissä olevaa trippiä
@@ -32,17 +43,25 @@ export function saveTrip(trip: Trip): void {
         return a > b ? -1 : 1;
     }
     );
+    await saveTripsToFile(trips);
 }
 
-export function deleteTrip({id}: {id: string}): void {
+export async function deleteTrip({id}: {id: string}): Promise<void> {
+    const trips = await loadTrips();
     const index = trips.findIndex((x) => x.id === id);
     if (index < 0) {
         throw new Error (`Matkaa id:llä ${id} ei löydy`);
     }
     trips.splice(index, 1);
+    await saveTripsToFile(trips);
 }
 
-let trips: Trip[] = [
+async function saveTripsToFile(trips: Trip[]) {
+    savedTrips = [...trips];
+    await overwriteJsonFile(TRIPS_FILE, savedTrips);
+}
+
+const exampleTrips: Trip[] = [
     {id: newId(), vehicleId: 'car1', description: 'Raahe'},
     {id: newId(), vehicleId: 'car2', description: 'Huvimatka'},
     {id: newId(), vehicleId: 'car3', description: 'Kokous'},
