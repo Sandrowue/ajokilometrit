@@ -4,19 +4,17 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 //import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as React from 'react';
-import { MD3LightTheme as DefaultTheme, PaperProvider } from 'react-native-paper';
+import {useState} from 'react';
 import NewTripCreator from './NewTripCreator';
 import { Trip } from './Trip';
-import OnTrip from './OnTrip';
 import TripList from './TripList';
 import { deleteTrip, loadTrips, saveTrip } from './store';
 
 const Nav = createBottomTabNavigator();
 
 const tabIcons = {
-    trips: ['ios-list-circle', 'ios-list-cirle-outline'],
+    trips: ['ios-list-circle', 'ios-list-circle-outline'],
     newTrip: ['ios-car', 'ios-car-outline'],
-    onTrip: ['ios-car', 'ios-car-outline'], 
 };
 
 const getScreenOptions = ({route}) => ({
@@ -34,6 +32,8 @@ const getScreenOptions = ({route}) => ({
 
 export default function Main() {
     const [trips, setTrips] = React.useState<Trip[]>([]);
+    const [shownTripId, setShownTripId] = useState<string | null>(null)
+    
     async function reloadTrips() {
         const newTrips = await loadTrips();
         setTrips(newTrips);
@@ -46,15 +46,20 @@ export default function Main() {
     function TripListScreen() {
         return (
             <TripList
+                shownTripId={shownTripId}
                 trips={trips}
-                saveTrip={(trip: Trip) => {
-                    saveTrip(trip);
-                    reloadTrips();
+                onTripClick={(trip: Trip) => setShownTripId(trip.id)}
+                onDismiss={() => setShownTripId(null)}
+                onSave={async (trip: Trip) => {
+                    setShownTripId(null);
+                    await saveTrip(trip);
+                    await reloadTrips();
                 }
             }
-                deleteTrip={(trip: Trip) => {
-                    deleteTrip(trip);
-                    reloadTrips();
+                onDelete={async (trip: Trip) => {
+                    setShownTripId(null);
+                    await deleteTrip(trip);
+                    await reloadTrips();
                 }
             }
             />
@@ -65,19 +70,8 @@ export default function Main() {
         return (
             <NewTripCreator
                 onSubmit={async(trip: Trip) => {
-                    reloadTrips();
-                    navigation.navigate('onTrip', {tripId: trip.id});
-                }}
-            />
-        );
-    }
-
-    function OnTripScreen({navigation, route}) {
-        return (
-            <OnTrip
-                route={route}
-                onSave={async (trip: Trip) => {
-                    reloadTrips();
+                    await reloadTrips();
+                    setShownTripId(trip.id);
                     navigation.navigate('trips');
                 }}
             />
@@ -97,11 +91,7 @@ export default function Main() {
                     component={NewTripScreen}
                     options={{title: 'Uusi matka'}}
                 />
-                <Nav.Screen
-                    name="onTrip"
-                    component={OnTripScreen}
-                    options={{title: 'Matkalla...'}}
-                    />
+   
             </Nav.Navigator>
         </NavigationContainer>
     );

@@ -19,7 +19,7 @@ export default function TripForm ({
     onDelete,
 }: Props) {
     const defaultCar = 'car1';
-    const [id] = useState(iv?.vehicleId ?? defaultCar);
+    const [id] = useState(iv?.id ?? newId);
     const[vehicle, setVehicle] = useState(iv?.vehicleId ?? defaultCar);
     const[description, setDescription] = useState(iv?.description ?? '');
     const[timestampAtBegin, setTimestampAtBegin] = useState<Date | null>(iv?.timestampAtBegin ?? null);
